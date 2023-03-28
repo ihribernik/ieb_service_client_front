@@ -1,9 +1,17 @@
-import { Button, Grid, TextField } from '@mui/material';
+import {
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+} from '@mui/material';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ReadyState } from 'react-use-websocket';
-import ProductService from '../services/products';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { WS_URL } from '../constants';
+import { getConnectionStatus } from '../utils';
 
 function Form({ readyState, onSubmit }) {
   const {
@@ -16,15 +24,48 @@ function Form({ readyState, onSubmit }) {
     },
   });
 
+  const [selectValues, setSelectValues] = useState([]);
+
+  const ws = useWebSocket(WS_URL, { shouldReconnect: () => true }, true);
+
+  const connectionStatus = getConnectionStatus(ws.readyState);
+
   async function retriveInfo() {
-    const response = await ProductService();
-    console.log(response);
+    if (ws.readyState !== ReadyState.OPEN) return;
+    const finalMessage = JSON.stringify({
+      type: 'get_info_all',
+      message: {
+        id: 1,
+      },
+    });
+    ws.sendMessage(finalMessage);
   }
 
   useEffect(() => {
+    if (ws.lastMessage !== null) {
+      const { data } = ws.lastMessage;
+      if (data) {
+        const parsedData = JSON.parse(data);
+
+        if (Array.isArray(parsedData.message)) {
+          const parsedSelect = parsedData.message.map((currData) => ({
+            label: currData.id,
+            value: currData.id,
+          }));
+          setSelectValues(parsedSelect);
+        } else {
+          const parsedSelect = [
+            { label: parsedData.message.id, value: parsedData.message.id },
+          ];
+          setSelectValues(parsedSelect);
+        }
+      }
+    }
+  }, [ws.lastMessage, setSelectValues]);
+
+  useEffect(() => {
     retriveInfo();
-    return () => {};
-  }, []);
+  }, [connectionStatus]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -36,21 +77,35 @@ function Form({ readyState, onSubmit }) {
         spacing={2}
       >
         <Grid item>
-          <Controller
-            name="id"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <TextField
-                multiline={false}
-                rows={1}
-                size="small"
-                label={field.name}
-                {...field}
-                disabled={readyState !== ReadyState.OPEN}
-              />
-            )}
-          />
+          {selectValues && (
+            <Controller
+              name="id"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <FormControl sx={{ minWidth: 80, minHeight: 80 }}>
+                  <InputLabel id={`select-${field.name}`}>
+                    {field.name}
+                  </InputLabel>
+
+                  <Select
+                    labelId={`select-${field.name}`}
+                    size="small"
+                    label={field.name}
+                    disabled={readyState !== ReadyState.OPEN}
+                    autoWidth
+                    {...field}
+                  >
+                    {selectValues.map((currValue) => (
+                      <MenuItem key={currValue.value} value={currValue.value}>
+                        {currValue.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            />
+          )}
         </Grid>
 
         <Grid item>
@@ -60,7 +115,7 @@ function Form({ readyState, onSubmit }) {
             disabled={!(readyState === ReadyState.OPEN) || !isValid}
             variant="contained"
           >
-            search the id
+            Buscar
           </Button>
         </Grid>
       </Grid>
