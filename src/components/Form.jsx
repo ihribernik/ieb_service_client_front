@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ReadyState } from 'react-use-websocket';
+import ProductService from '../services/products';
 
 function Form({ readyState, onSubmit }) {
   const {
@@ -14,6 +15,17 @@ function Form({ readyState, onSubmit }) {
       id: '',
     },
   });
+
+  async function retriveInfo() {
+    const response = await ProductService();
+    const data = await response.json();
+    console.log(data);
+  }
+
+  useEffect(() => {
+    retriveInfo();
+    return () => {};
+  }, []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
