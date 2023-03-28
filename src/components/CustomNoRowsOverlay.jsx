@@ -12,7 +12,7 @@ function CustomNoRowsOverlay() {
         paddingTop: '20px',
       }}
     >
-      no row selecteds
+      no rows fetched
     </div>
   );
 }
