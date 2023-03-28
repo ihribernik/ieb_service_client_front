@@ -37,11 +37,24 @@ function PrincipalLayout() {
     if (lastMessage !== null) {
       const { data } = lastMessage;
       if (data) {
-        const parsedData = JSON.parse(data);
-        if (Array.isArray(parsedData.message)) {
-          setRows([...parsedData.message]);
+        const { message, type } = JSON.parse(data);
+        if (Array.isArray(message)) {
+          if (message.length === 0) {
+            if (type === 'start') {
+              sendMessage(
+                JSON.stringify({
+                  type: 'get_info',
+                }),
+              );
+            } else if (type === 'error') {
+              setRows([]);
+              console.log('Error: ', message);
+            }
+          } else {
+            setRows([...message]);
+          }
         } else {
-          setRows([{ ...parsedData.message }]);
+          setRows([{ ...message }]);
         }
       }
     }

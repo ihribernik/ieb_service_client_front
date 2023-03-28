@@ -45,18 +45,24 @@ function Form({ readyState, onSubmit }) {
     if (ws.lastMessage !== null) {
       const { data } = ws.lastMessage;
       if (data) {
-        const parsedData = JSON.parse(data);
-
-        if (Array.isArray(parsedData.message)) {
-          const parsedSelect = parsedData.message.map((currData) => ({
-            label: currData.id,
-            value: currData.id,
-          }));
-          setSelectValues(parsedSelect);
+        const { message, type } = JSON.parse(data);
+        if (Array.isArray(message)) {
+          if (message.length === 0) {
+            if (type === 'start') {
+              retriveInfo();
+            } else if (type === 'error') {
+              setSelectValues([]);
+              console.log('Error: ', message);
+            }
+          } else {
+            const parsedSelect = message.map((currData) => ({
+              label: currData.id,
+              value: currData.id,
+            }));
+            setSelectValues(parsedSelect);
+          }
         } else {
-          const parsedSelect = [
-            { label: parsedData.message.id, value: parsedData.message.id },
-          ];
+          const parsedSelect = [{ label: message.id, value: message.id }];
           setSelectValues(parsedSelect);
         }
       }
