@@ -1,13 +1,8 @@
-import MenuIcon from '@mui/icons-material/Menu';
 import {
-  AppBar,
-  Box,
-  Button,
-  IconButton,
-  Toolbar,
-  Typography,
+  AppBar, Box, Button, Toolbar, Typography,
 } from '@mui/material';
 import Chip from '@mui/material/Chip';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { ReadyState } from 'react-use-websocket';
 
@@ -40,5 +35,11 @@ function Header({ status, readyState, onClick }) {
     </header>
   );
 }
+
+Header.propTypes = {
+  status: PropTypes.string.isRequired,
+  readyState: PropTypes.number.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 export default Header;

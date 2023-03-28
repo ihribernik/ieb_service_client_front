@@ -17,4 +17,6 @@ function CustomNoRowsOverlay() {
   );
 }
 
+CustomNoRowsOverlay.propTypes = {};
+
 export default CustomNoRowsOverlay;

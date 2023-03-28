@@ -1,4 +1,4 @@
-import { Button, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
@@ -18,11 +18,10 @@ const WS_URL = 'ws://127.0.0.1:8001/ws/';
 function PrincipalLayout() {
   const [rows, setRows] = useState([]);
   const [columns, setColumns] = useState([]);
-  const [url, setUrl] = useState(WS_URL);
   const [isOpen, setIsOpen] = useState(true);
 
-  const { sendMessage, lastMessage, readyState, getWebSocket } = useWebSocket(
-    url,
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    WS_URL,
     {
       shouldReconnect: () => true,
     },
@@ -121,5 +120,7 @@ function PrincipalLayout() {
     </>
   );
 }
+
+PrincipalLayout.propTypes = {};
 
 export default PrincipalLayout;

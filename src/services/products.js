@@ -1,19 +1,10 @@
-import { encode } from 'base-64';
+import axios from 'axios';
 
-const getProductsId = async () => {
-  const headers = new Headers({
-    Authorization: `Basic ${encode(
-      `${import.meta.env.VITE_API_USERNAME}:${
-        import.meta.env.VITE_API_PASSWORD
-      }`,
-    )}`,
-    'Content-type': 'application/json',
-  });
-
-  return fetch(import.meta.env.VITE_API_URL, {
-    headers,
-    method: 'GET',
-  });
-};
+const getProductsId = async () => axios.get(import.meta.env.VITE_API_URL, {
+  auth: {
+    username: import.meta.env.VITE_API_USERNAME,
+    password: import.meta.env.VITE_API_PASSWORD,
+  },
+});
 
 export default getProductsId;

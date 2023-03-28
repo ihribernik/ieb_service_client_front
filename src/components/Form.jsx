@@ -18,8 +18,7 @@ function Form({ readyState, onSubmit }) {
 
   async function retriveInfo() {
     const response = await ProductService();
-    const data = await response.json();
-    console.log(data);
+    console.log(response);
   }
 
   useEffect(() => {
